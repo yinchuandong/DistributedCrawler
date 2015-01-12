@@ -23,9 +23,9 @@ public class SocketClient {
 	}
 	
 	public void start(){
-		Command command = new Command(0, "hello master, I am slave3");
+		Command command = new Command(0, "hello master, I am slave1");
 		this.handler.send(command);
-		command = new Command(0, "hello master, I am slave4");
+		command = new Command(0, "hello master, I am slave2");
 		this.handler.send(command);
 	}
 	
