@@ -13,7 +13,7 @@ import javax.swing.JFrame;
 import Main.Handler.OnAsyncTaskListener;
 import model.Command;
 
-public class SocketThreadPool {
+public class SocketServer {
 
 	private int port = 9090;
 	private ServerSocket serverSocket = null;
@@ -24,9 +24,11 @@ public class SocketThreadPool {
 	 */
 	private HashMap<String, Handler> slaveMap = null;
 	
+	private OnAsyncTaskListener onAsyncTaskListener = null;
+	
 	private boolean isRunning = false;
 	
-	public SocketThreadPool(int port) throws IOException{
+	public SocketServer(int port) throws IOException{
 		this.port = port;
 		this.threadPool = Executors.newCachedThreadPool();
 		this.serverSocket = new ServerSocket(port);
@@ -34,13 +36,11 @@ public class SocketThreadPool {
 	}
 	
 	/**
-	 * 有界面的情况下自己重载吧
-	 * @param jFrame
-	 * @param port
-	 * @throws IOException
+	 * 设置监听器，用来接受命令
+	 * @param onAsyncTaskListener
 	 */
-	public SocketThreadPool(JFrame jFrame, int port) throws IOException{
-		this(port);
+	public void setOnAsyncTaskListener(OnAsyncTaskListener onAsyncTaskListener){
+		this.onAsyncTaskListener = onAsyncTaskListener;
 	}
 	
 	/**
@@ -55,6 +55,7 @@ public class SocketThreadPool {
 					try {
 						Socket socket = serverSocket.accept();
 						Handler handler = new Handler(socket);
+						handler.setOnAsyncTaskListener(onAsyncTaskListener);
 				
 						InetAddress address = socket.getInetAddress();
 						String key = address.getHostAddress() + ":" + socket.getPort();
@@ -64,7 +65,7 @@ public class SocketThreadPool {
 						//将slave机加到map中
 						slaveMap.put(key, handler);
 						
-						threadPool.execute(new SocketThread(handler));
+						threadPool.execute(handler);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -73,10 +74,5 @@ public class SocketThreadPool {
 		}.start();
 	}
 	
-	public static void main(String[] args) throws IOException{
-		SocketThreadPool threadPool = new SocketThreadPool(9090);
-		threadPool.start();
-		System.out.println("启动");
-	}
 	
 }

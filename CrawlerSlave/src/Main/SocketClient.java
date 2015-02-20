@@ -18,38 +18,28 @@ public class SocketClient {
 	public SocketClient() throws UnknownHostException, IOException {
 		this.serverSocket = new Socket(masterIp, masterPort);
 		this.handler = new Handler(serverSocket);
-		
-		this.bindEvent();
 	}
 	
-	public void start(){
-		Command command = new Command(0, "hello master, I am slave1");
-		this.handler.send(command);
-		command = new Command(0, "hello master, I am slave2");
-		this.handler.send(command);
+	/**
+	 * 设置监听器，用来接受命令回调
+	 * @param onAsyncTaskListener
+	 */
+	public void setOnAsyncTaskListener(OnAsyncTaskListener onAsyncTaskListener){
+		handler.setOnAsyncTaskListener(onAsyncTaskListener);
 	}
 	
-	private void bindEvent(){
-		handler.setOnAsyncTaskListener(new OnAsyncTaskListener() {
-			
-			@Override
-			public void onReceive(Socket socket, Command command) {
-				System.out.println(command.getType() + "-" + command.getInfo());
-			}
-
-			@Override
-			public void onClose(String slaveId) {
-				
-			}
-		});
+	/**
+	 * 发送数据
+	 * @param command
+	 * @return
+	 */
+	public boolean send(Command command) {
+		return handler.send(command);
 	}
 	
-	public static void main(String[] args){
-		try {
-			SocketClient client = new SocketClient();
-			client.start();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public Handler getHandler(){
+		return handler;
 	}
+	
+	
 }

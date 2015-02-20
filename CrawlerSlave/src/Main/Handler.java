@@ -21,7 +21,7 @@ import model.Command;
  * @author wangjiewen
  *
  */
-public class Handler {
+public class Handler implements Runnable{
 
 	private Socket socket = null;
 
@@ -38,15 +38,28 @@ public class Handler {
 		this.socket = socket;
 		this.inetAddress = socket.getInetAddress();
 		this.slaveId = inetAddress.getHostAddress() + ":" + socket.getPort();
-
-		// this.init();
-		runReceive();
+	}
+	
+	public Socket getSocket(){
+		return this.socket;
+	}
+	
+	public InetAddress getInetAddress() {
+		return inetAddress;
 	}
 
-	private void init() {
-		System.out.println(inetAddress.getHostAddress());
+	public String getSlaveId() {
+		return slaveId;
 	}
 
+	/**
+	 * 设置监听器，用来接受命令
+	 * @param onAsyncTaskListener
+	 */
+	public void setOnAsyncTaskListener(OnAsyncTaskListener onAsyncTaskListener){
+		this.onAsyncTaskListener = onAsyncTaskListener;
+	}
+	
 	/**
 	 * 发送数据
 	 * 
@@ -68,60 +81,44 @@ public class Handler {
 		return false;
 	}
 
-	/**
-	 * 设置监听器，进行回调
-	 * 
-	 * @param onAsyncTaskListener
-	 */
-	public void setOnAsyncTaskListener(OnAsyncTaskListener onAsyncTaskListener) {
-		this.onAsyncTaskListener = onAsyncTaskListener;
-	}
+	@Override
+	public void run() {
+		try {
+			ObjectInputStream inputStream = new ObjectInputStream(
+					socket.getInputStream());
 
-	/**
-	 * 进行接收，开启另一个线程
-	 */
-	private void runReceive() {
-		new Thread() {
-			public void run() {
-				try {
-					ObjectInputStream inputStream = new ObjectInputStream(
-							socket.getInputStream());
-
-					Object obj = null;
-					
-					while ((obj = inputStream.readObject()) != null) {
-						Command command = (Command) obj;
-						if (onAsyncTaskListener != null) {
-							onAsyncTaskListener.onReceive(socket, command);
-						}
-						
-						//解决eof异常
-						try{
-							inputStream = new ObjectInputStream(socket.getInputStream());
-						}catch(EOFException e){
-							continue;
-						}
-					}
-					inputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				} finally{
-					if(socket != null){
-						try {
-							socket.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
+			Object obj = null;
+			
+			while ((obj = inputStream.readObject()) != null) {
+				Command command = (Command) obj;
+				if (onAsyncTaskListener != null) {
+					onAsyncTaskListener.onReceive(Handler.this, command);
 				}
 				
-				onAsyncTaskListener.onClose(slaveId);
-				System.out.println("master close");
+				//解决eof异常
+				try{
+					inputStream = new ObjectInputStream(socket.getInputStream());
+				}catch(EOFException e){
+					continue;
+				}
 			}
-		}.start();
-
+			inputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} finally{
+			if(socket != null){
+				try {
+					socket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		onAsyncTaskListener.onClose(slaveId);
+		System.out.println("master close");
 	}
 
 	public interface OnAsyncTaskListener {
@@ -131,7 +128,7 @@ public class Handler {
 		 * 
 		 * @param command
 		 */
-		public void onReceive(Socket socket, Command command);
+		public void onReceive(Handler handler, Command command);
 		
 		public void onClose(String slaveId);
 	}
