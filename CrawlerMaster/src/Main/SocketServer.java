@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -44,6 +45,30 @@ public class SocketServer {
 	}
 	
 	/**
+	 * 给指定从机发送命令
+	 * @param slaveId 由IP和port组成，such as:192.268.1.1:8080
+	 * @param command
+	 * @return
+	 */
+	public boolean send(String slaveId, Command command){
+		Handler handler = this.slaveMap.get(slaveId);
+		return handler.send(command);
+	}
+	
+	/**
+	 * 给所有从机发送命令
+	 * @param command
+	 */
+	public void sendAll(Command command){
+		Iterator<String> iter = this.slaveMap.keySet().iterator();
+		while(iter.hasNext()){
+			String key = iter.next();
+			Handler handler = slaveMap.get(key);
+			handler.send(command);
+		}
+	}
+	
+	/**
 	 * 开启服务器监听，判断是否有从机加入
 	 */
 	public void start(){
@@ -51,6 +76,7 @@ public class SocketServer {
 		
 		new Thread(){
 			public void run(){
+				System.out.println("服务器启动成功");
 				while(isRunning){
 					try {
 						Socket socket = serverSocket.accept();

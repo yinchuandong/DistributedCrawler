@@ -15,9 +15,26 @@ public class SocketClient {
 	private Socket serverSocket = null;
 	private Handler handler = null;
 	
-	public SocketClient() throws UnknownHostException, IOException {
+	public SocketClient(){
+		
+	}
+	public SocketClient(String masterIp, int masterPort) throws UnknownHostException, IOException{
+		this.masterIp = masterIp;
+		this.masterPort = masterPort;
 		this.serverSocket = new Socket(masterIp, masterPort);
 		this.handler = new Handler(serverSocket);
+	}
+	
+	public void setMaster(String masterIp, int masterPort){
+		this.masterIp = masterIp;
+		this.masterPort = masterPort;
+	}
+	
+	/**
+	 * 开启监听
+	 */
+	public void start(){
+		new Thread(this.handler).start();
 	}
 	
 	/**
