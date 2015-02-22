@@ -30,14 +30,14 @@ public class Handler implements Runnable{
 	/**
 	 * 从机在SocketThreadPool中的key
 	 */
-	private String slaveId = null;
+	private String serverId = null;
 
 	private OnAsyncTaskListener onAsyncTaskListener = null;
 
 	public Handler(Socket socket) {
 		this.socket = socket;
 		this.inetAddress = socket.getInetAddress();
-		this.slaveId = inetAddress.getHostAddress() + ":" + socket.getPort();
+		this.serverId = inetAddress.getHostAddress() + ":" + socket.getPort();
 	}
 	
 	public Socket getSocket(){
@@ -48,8 +48,8 @@ public class Handler implements Runnable{
 		return inetAddress;
 	}
 
-	public String getSlaveId() {
-		return slaveId;
+	public String getServerId() {
+		return serverId;
 	}
 
 	/**
@@ -117,8 +117,7 @@ public class Handler implements Runnable{
 			}
 		}
 		
-		onAsyncTaskListener.onClose(slaveId);
-		System.out.println("master close");
+		onAsyncTaskListener.onClose(serverId);
 	}
 
 	public interface OnAsyncTaskListener {
@@ -130,6 +129,6 @@ public class Handler implements Runnable{
 		 */
 		public void onReceive(Handler handler, Command command);
 		
-		public void onClose(String slaveId);
+		public void onClose(String serverId);
 	}
 }

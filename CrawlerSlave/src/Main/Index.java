@@ -120,7 +120,7 @@ public class Index extends JFrame{
 				System.out.println("123123");
 				String text = textArea.getText();
 				String cmdStr = "";
-				cmdStr += handler.getSlaveId() + "--type";
+				cmdStr += handler.getServerId() + "--type";
 				cmdStr += command.getType() + " info:" + command.getInfo();
 				text = text + cmdStr + "\n";
 				textArea.setText(text);
@@ -128,8 +128,8 @@ public class Index extends JFrame{
 			}
 			
 			@Override
-			public void onClose(String slaveId) {
-				
+			public void onClose(String masterId) {
+				System.out.println("master closed:" + masterId);
 			}
 		});
 	}
