@@ -3,7 +3,34 @@ package model;
 import java.io.Serializable;
 
 public class Command implements Serializable{
-	
+	/**
+	 * 开启任务
+	 */
+	public static final int CMD_START = 1000;
+	/**
+	 * 分发任务
+	 */
+	public static final int CMD_DISPATCH_TASK = 1001;
+	/**
+	 * 停止任务
+	 */
+	public static final int CMD_STOP = 1002;
+	/**
+	 * 回收爬取的文件
+	 */
+	public static final int CMD_RECALL_FILE = 1003;
+	/**
+	 * 暂停任务
+	 */
+	public static final int CMD_PAUSE = 1004;
+	/**
+	 * 重启任务
+	 */
+	public static final int CMD_RESTART = 1005;
+	/**
+	 * 发送消息
+	 */
+	public static final int CMD_MSG = 1006;
 	
 	/**
 	 * 

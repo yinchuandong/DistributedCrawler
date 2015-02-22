@@ -105,7 +105,7 @@ public class Index extends JFrame{
 				if(msg.equals("")){
 					msg = "Hello master, I am slave!";
 				}
-				socketClient.send(new Command(2, msg));
+				socketClient.send(new Command(Command.CMD_MSG, msg));
 				msg = "";
 			}
 		});
@@ -117,14 +117,20 @@ public class Index extends JFrame{
 			
 			@Override
 			public void onReceive(Handler handler, Command command) {
-				System.out.println("123123");
-				String text = textArea.getText();
-				String cmdStr = "";
-				cmdStr += handler.getServerId() + "--type";
-				cmdStr += command.getType() + " info:" + command.getInfo();
-				text = text + cmdStr + "\n";
-				textArea.setText(text);
-				textArea.setCaretPosition(text.length());
+				switch (command.getType()) {
+				case Command.CMD_MSG:
+					String text = textArea.getText();
+					String cmdStr = "";
+					cmdStr += handler.getServerId() + "--type";
+					cmdStr += command.getType() + " info:" + command.getInfo();
+					text = text + cmdStr + "\n";
+					textArea.setText(text);
+					textArea.setCaretPosition(text.length());
+					break;
+
+				default:
+					break;
+				}
 			}
 			
 			@Override

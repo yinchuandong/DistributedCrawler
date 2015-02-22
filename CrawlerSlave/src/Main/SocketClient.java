@@ -8,30 +8,6 @@ import Main.Handler.OnAsyncTaskListener;
 import model.Command;
 
 public class SocketClient {
-	/**
-	 * 开启任务
-	 */
-	public static final int CMD_START = 1000;
-	/**
-	 * 分发任务
-	 */
-	public static final int CMD_DISPATCH_TASK = 1001;
-	/**
-	 * 停止任务
-	 */
-	public static final int CMD_STOP = 1002;
-	/**
-	 * 回收爬取的文件
-	 */
-	public static final int CMD_RECALL_FILE = 1003;
-	/**
-	 * 暂停任务
-	 */
-	public static final int CMD_PAUSE = 1004;
-	/**
-	 * 重启任务
-	 */
-	public static final int CMD_RESTART = 1005;
 	
 	private String masterIp = "127.0.0.1";
 	private int masterPort = 9090;

@@ -13,7 +13,6 @@ import model.Command;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 import javax.swing.JTextArea;
 
 public class Index extends JFrame{
@@ -86,7 +85,7 @@ public class Index extends JFrame{
 				if(msg.equals("")){
 					msg = "Hello slave, I am master!";
 				}
-				socketServer.sendAll(new Command(1, msg));
+				socketServer.sendAll(new Command(Command.CMD_MSG, msg));
 				msg = "";
 			}
 		});
@@ -97,13 +96,21 @@ public class Index extends JFrame{
 			
 			@Override
 			public void onReceive(Handler handler, Command command) {
-				String text = textArea.getText();
-				String cmdStr = "";
-				cmdStr += handler.getServerId() + "--type";
-				cmdStr += command.getType() + " info:" + command.getInfo();
-				text = text + cmdStr + "\n";
-				textArea.setText(text);
-				textArea.setCaretPosition(text.length());
+				switch (command.getType()) {
+				case Command.CMD_MSG:
+					String text = textArea.getText();
+					String cmdStr = "";
+					cmdStr += handler.getServerId() + "--type";
+					cmdStr += command.getType() + " info:" + command.getInfo();
+					text = text + cmdStr + "\n";
+					textArea.setText(text);
+					textArea.setCaretPosition(text.length());
+					
+					break;
+
+				default:
+					break;
+				}
 			}
 			
 			@Override
