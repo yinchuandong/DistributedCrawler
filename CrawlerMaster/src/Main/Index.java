@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -25,6 +27,7 @@ public class Index extends JFrame{
 	
 	private SocketServer socketServer;
 	private DefaultTableModel tableModel;
+	private Map<String, Integer> slaveIdMap;
 	private JTextField sendText;
 	private JButton sendBtn;
 	private JTextArea textArea;
@@ -75,7 +78,7 @@ public class Index extends JFrame{
 		getContentPane().add(startBtn);
 		
 		scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(365, 106, 341, 277);
+		scrollPane_1.setBounds(365, 106, 365, 277);
 		getContentPane().add(scrollPane_1);
 		
 		table = new JTable(){
@@ -129,12 +132,7 @@ public class Index extends JFrame{
 	    table.getColumnModel().getColumn(0).setMaxWidth(40);
 	    table.getColumnModel().getColumn(0).setPreferredWidth(40);
 	    
-	    for (int count = 1; count <= 3; count++) {
-	        tableModel.addRow(new Object[] { false, "data", "data"});
-	    }
-	    
-	    boolean isChecked = (boolean) tableModel.getValueAt(0, 0);
-	    System.out.println(isChecked);
+	    slaveIdMap = new HashMap<String, Integer>();
 	   
 	}
 	
@@ -167,6 +165,13 @@ public class Index extends JFrame{
 		socketServer.setOnAsyncTaskListener(new OnAsyncTaskListener() {
 			
 			@Override
+			public void onAccept(String slaveId, Handler handler) {
+				System.out.println(handler.getInetAddress());
+				tableModel.addRow(new Object[] { false, handler.getSocket().getInetAddress(), handler.getSocket().getPort()});
+				slaveIdMap.put(slaveId, slaveIdMap.size());
+			}
+			
+			@Override
 			public void onReceive(Handler handler, Command command) {
 				switch (command.getType()) {
 				case Command.CMD_MSG:
@@ -188,16 +193,21 @@ public class Index extends JFrame{
 			@Override
 			public void onClose(String slaveId) {
 				socketServer.removeSlave(slaveId);
+				tableModel.removeRow(slaveIdMap.get(slaveId));
+				slaveIdMap.remove(slaveId);
 				System.out.println("slave closed:" + slaveId);
 			}
+
 		});
 		
 		
+		//分配url
 		dispatchBtn.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				boolean isChecked = (boolean) tableModel.getValueAt(0, 0);
+			    System.out.println(isChecked);
 			}
 		});
 	}

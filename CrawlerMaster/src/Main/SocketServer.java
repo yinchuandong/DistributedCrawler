@@ -97,6 +97,9 @@ public class SocketServer {
 						
 						//将slave机加到map中
 						slaveMap.put(key, handler);
+						if(onAsyncTaskListener != null){
+							onAsyncTaskListener.onAccept(key, handler);
+						}
 						
 						threadPool.execute(handler);
 					} catch (IOException e) {
