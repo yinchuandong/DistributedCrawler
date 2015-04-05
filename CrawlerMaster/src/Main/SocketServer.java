@@ -68,6 +68,14 @@ public class SocketServer {
 	}
 	
 	/**
+	 * 移除slaveId
+	 * @param slaveId
+	 */
+	public void removeSlave(String slaveId){
+		this.slaveMap.remove(slaveId);
+	}
+	
+	/**
 	 * 开启服务器监听，判断是否有从机加入
 	 */
 	public void start(){

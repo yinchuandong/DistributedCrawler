@@ -112,6 +112,7 @@ public class Handler implements Runnable{
 				try {
 					socket.close();
 				} catch (IOException e) {
+					System.out.println(this.serverId + "---closed");
 					e.printStackTrace();
 				}
 			}
