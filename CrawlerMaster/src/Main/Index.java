@@ -211,4 +211,34 @@ public class Index extends JFrame{
 			}
 		});
 	}
+	
+	
+	private void dispatchUrl(){
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

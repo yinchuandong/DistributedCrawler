@@ -11,7 +11,7 @@ public class ServerNode{
 	}
 	
 	public String toString(){
-		return ip;
+		return ip + port;
 	}
 
 	public String getIp() {
