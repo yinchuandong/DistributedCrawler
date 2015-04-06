@@ -29,6 +29,12 @@ public class ServerNode{
 	public void setPort(int port) {
 		this.port = port;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj.toString().equals(this.toString());
+	}
+	
 	
 	
 }

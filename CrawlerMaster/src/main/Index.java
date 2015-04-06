@@ -152,9 +152,7 @@ public class Index extends JFrame{
 	    //initialize slaveId map
 	    slaveIdMap = new HashMap<String, Integer>();
 	    consistentHash = new ConsistentHash<ServerNode>(new HashFunction(), 1000);
-	    
-	    loadSlave();
-	    loadSeeds();
+	    seedsList = new ArrayList<String>();
 	}
 	
 	private void bindFrameEvent(){
@@ -188,7 +186,7 @@ public class Index extends JFrame{
 			@Override
 			public void onAccept(String slaveId, Handler handler) {
 				System.out.println(handler.getInetAddress());
-				tableModel.addRow(new Object[] { false, handler.getSocket().getInetAddress(), handler.getSocket().getPort()});
+				tableModel.addRow(new Object[] { true, handler.getSocket().getInetAddress().getHostAddress(), handler.getSocket().getPort()});
 				slaveIdMap.put(slaveId, slaveIdMap.size());
 			}
 			
@@ -229,20 +227,33 @@ public class Index extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 //				boolean isChecked = (boolean) tableModel.getValueAt(0, 0);
 //			    System.out.println(isChecked);
+				loadSlave();
+				loadSeeds();
 				dispatchUrl();
+			}
+		});
+		
+		doCrawlBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
 			}
 		});
 	}
 	
 	private void loadSlave(){
-		HashMap<String, Handler> slaveMap = socketServer.getSlaveMap();
-		Iterator<String> iter = slaveMap.keySet().iterator();
-		while(iter.hasNext()){
-			String[] keyArr = iter.next().split(":");
-			String ip = keyArr[0];
-			int port = Integer.parseInt(keyArr[1]);
-			ServerNode node = new ServerNode(ip, port);
-			consistentHash.add(node);
+		//select the checked slave node
+		int row = tableModel.getRowCount();
+		consistentHash.clear();
+		for (int i = 0; i < row; i++) {
+			boolean isSlected = (boolean)tableModel.getValueAt(i, 0);
+			if(isSlected){
+				String ip = (String)tableModel.getValueAt(i, 1);
+				int port = (int)tableModel.getValueAt(i, 2);
+				ServerNode node = new ServerNode(ip, port);
+				consistentHash.add(node);
+			}
 		}
 	}
 	
@@ -262,11 +273,12 @@ public class Index extends JFrame{
 	}
 	
 	private void dispatchUrl(){
-		for (String seeds : seedsList) {
-			ServerNode node = consistentHash.get(seeds);
+		for (String surl : seedsList) {
+			ServerNode node = consistentHash.get(surl);
 			String slaveId = node.toString();
-			Command cmd = new Command(Command.CMD_DISPATCH_TASK, "");
-			socketServer.send(slaveId, null);
+			Command cmd = new Command(Command.CMD_DISPATCH_TASK, surl);
+//			socketServer.send(slaveId, cmd);
+			System.out.println(slaveId);
 		}
 	}
 	

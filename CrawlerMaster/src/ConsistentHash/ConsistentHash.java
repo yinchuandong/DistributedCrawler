@@ -62,6 +62,10 @@ public class ConsistentHash<T> {
 			circle.remove(hashFunction.hash(node.toString() + i));
 		}
 	}
+	
+	public void clear(){
+		circle.clear();
+	}
 
 	/**
 	 * get the specific node by a key, <br/>
