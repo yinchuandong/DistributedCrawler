@@ -1,4 +1,4 @@
-package Main;
+package main;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -7,13 +7,16 @@ import java.net.UnknownHostException;
 
 import javax.swing.JFrame;
 
-import Main.Handler.OnAsyncTaskListener;
 import model.Command;
 
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+
+import distribute.Handler;
+import distribute.SocketClient;
+import distribute.Handler.OnAsyncTaskListener;
 
 public class Index extends JFrame{
 	private SocketClient socketClient;
@@ -112,7 +115,7 @@ public class Index extends JFrame{
 	}
 	
 	private void bindAsyncEvent(){
-		System.out.println("bind success");
+		// listening server socket
 		socketClient.setOnAsyncTaskListener(new OnAsyncTaskListener() {
 			
 			@Override
@@ -126,6 +129,10 @@ public class Index extends JFrame{
 					text = text + cmdStr + "\n";
 					textArea.setText(text);
 					textArea.setCaretPosition(text.length());
+					break;
+					
+				case Command.CMD_DISPATCH_TASK:
+					
 					break;
 
 				default:

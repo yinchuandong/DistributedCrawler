@@ -1,4 +1,4 @@
-package Main;
+package distribute;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 
 import javax.swing.JFrame;
 
-import Main.Handler.OnAsyncTaskListener;
+import distribute.Handler.OnAsyncTaskListener;
 import model.Command;
 
 public class SocketServer {
@@ -33,6 +33,10 @@ public class SocketServer {
 		this.threadPool = Executors.newCachedThreadPool();
 		this.serverSocket = new ServerSocket(port);
 		this.slaveMap = new HashMap<String, Handler>();
+	}
+	
+	public HashMap<String, Handler> getSlaveMap(){
+		return this.slaveMap;
 	}
 	
 	/**

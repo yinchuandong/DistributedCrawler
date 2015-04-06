@@ -23,14 +23,14 @@ public class Test {
 //		System.out.println(consistentHash.get("192.168.1.4").getIp());
 //		System.out.println(consistentHash.get("192.168.1.5").getIp());
 //		System.out.println(consistentHash.get("192.168.1.9").getIp());
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 50; i++) {
 			System.out.println(consistentHash.get("192.168.1." + i).getIp());
 		}
-		consistentHash.remove(new ServerNode("192.168.1.1",9001));
-		System.out.println("------------------------------");
-		for (int i = 0; i < 20; i++) {
-			System.out.println(consistentHash.get("192.168.1." + i).getIp());
-		}
+//		consistentHash.remove(new ServerNode("192.168.1.1",9001));
+//		System.out.println("------------------------------");
+//		for (int i = 0; i < 20; i++) {
+//			System.out.println(consistentHash.get("192.168.1." + i).getIp());
+//		}
 
 	}
 

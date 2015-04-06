@@ -1,10 +1,10 @@
-package Main;
+package distribute;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import Main.Handler.OnAsyncTaskListener;
+import distribute.Handler.OnAsyncTaskListener;
 import model.Command;
 
 public class SocketClient {

@@ -20,6 +20,11 @@ public class ConsistentHash<T> {
 	 */
 	private final SortedMap<Integer, T> circle = new TreeMap<Integer, T>();
 
+	
+	public ConsistentHash(HashFunction hashFunction, int numberOfReplicas){
+		this(hashFunction, numberOfReplicas, null);
+	}
+	
 	/**
 	 * 
 	 * @param hashFunction specific hash function to calculate hash code
@@ -31,11 +36,13 @@ public class ConsistentHash<T> {
 		this.hashFunction = hashFunction;
 		this.numberOfReplicas = numberOfReplicas;
 
-		for (T node : nodes) {
-			add(node);
+		if(nodes != null){
+			for (T node : nodes) {
+				add(node);
+			}
 		}
 	}
-
+	
 	/**
 	 * add a real node to consistent hash, and it will automatically generate numberOfReplicas virtual nodes
 	 * @param node

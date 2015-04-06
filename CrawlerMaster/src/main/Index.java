@@ -1,16 +1,24 @@
-package Main;
+package main;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.JFrame;
 
-import Main.Handler.OnAsyncTaskListener;
+import ConsistentHash.ConsistentHash;
+import ConsistentHash.HashFunction;
+import ConsistentHash.ServerNode;
 import model.Command;
 
 import javax.swing.DefaultListModel;
@@ -23,11 +31,19 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import distribute.Handler;
+import distribute.SocketServer;
+import distribute.Handler.OnAsyncTaskListener;
+
 public class Index extends JFrame{
-	
+	//--------functional variables-------
 	private SocketServer socketServer;
 	private DefaultTableModel tableModel;
 	private Map<String, Integer> slaveIdMap;
+	private ArrayList<String> seedsList;
+	private ConsistentHash<ServerNode> consistentHash;
+	
+	//--------UI components--------
 	private JTextField sendText;
 	private JButton sendBtn;
 	private JTextArea textArea;
@@ -123,6 +139,7 @@ public class Index extends JFrame{
 	}
 	
 	private void initData(){
+		//initialize table model
 		tableModel = new DefaultTableModel();
 		String header[] = new String[] { "Status", "IP", "Port", };
 	    tableModel.setColumnIdentifiers(header);
@@ -132,8 +149,12 @@ public class Index extends JFrame{
 	    table.getColumnModel().getColumn(0).setMaxWidth(40);
 	    table.getColumnModel().getColumn(0).setPreferredWidth(40);
 	    
+	    //initialize slaveId map
 	    slaveIdMap = new HashMap<String, Integer>();
-	   
+	    consistentHash = new ConsistentHash<ServerNode>(new HashFunction(), 1000);
+	    
+	    loadSlave();
+	    loadSeeds();
 	}
 	
 	private void bindFrameEvent(){
@@ -161,7 +182,7 @@ public class Index extends JFrame{
 	}
 	
 	private void bindAsyncEvent(){
-		//绑定从机监听事件
+		//listening slave socket
 		socketServer.setOnAsyncTaskListener(new OnAsyncTaskListener() {
 			
 			@Override
@@ -206,15 +227,47 @@ public class Index extends JFrame{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				boolean isChecked = (boolean) tableModel.getValueAt(0, 0);
-			    System.out.println(isChecked);
+//				boolean isChecked = (boolean) tableModel.getValueAt(0, 0);
+//			    System.out.println(isChecked);
+				dispatchUrl();
 			}
 		});
 	}
 	
+	private void loadSlave(){
+		HashMap<String, Handler> slaveMap = socketServer.getSlaveMap();
+		Iterator<String> iter = slaveMap.keySet().iterator();
+		while(iter.hasNext()){
+			String[] keyArr = iter.next().split(":");
+			String ip = keyArr[0];
+			int port = Integer.parseInt(keyArr[1]);
+			ServerNode node = new ServerNode(ip, port);
+			consistentHash.add(node);
+		}
+	}
+	
+	private void loadSeeds(){
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(new File("./data/baidu.txt")));
+			String buff = null;
+			while((buff = reader.readLine()) != null){
+				seedsList.add(buff);
+			}
+			reader.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	private void dispatchUrl(){
-		
+		for (String seeds : seedsList) {
+			ServerNode node = consistentHash.get(seeds);
+			String slaveId = node.toString();
+			Command cmd = new Command(Command.CMD_DISPATCH_TASK, "");
+			socketServer.send(slaveId, null);
+		}
 	}
 	
 	

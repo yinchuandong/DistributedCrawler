@@ -1,4 +1,4 @@
-package Main;
+package distribute;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -112,6 +112,7 @@ public class Handler implements Runnable{
 				try {
 					socket.close();
 				} catch (IOException e) {
+					System.out.println(this.serverId + "---closed");
 					e.printStackTrace();
 				}
 			}
@@ -121,6 +122,13 @@ public class Handler implements Runnable{
 	}
 
 	public interface OnAsyncTaskListener {
+		
+		/**
+		 * 新加入一个从机时被调用
+		 * @param slaveId
+		 * @param handler
+		 */
+		public void onAccept(String slaveId, Handler handler);
 
 		/**
 		 * 接收到命令的时候调用
@@ -129,6 +137,6 @@ public class Handler implements Runnable{
 		 */
 		public void onReceive(Handler handler, Command command);
 		
-		public void onClose(String serverId);
+		public void onClose(String slaveId);
 	}
 }
