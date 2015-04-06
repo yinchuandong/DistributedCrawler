@@ -100,9 +100,9 @@ public class PageUtil {
 		return domain; 
 	}
 	
-	public static void exportFile(String dirPath, String pageContent){
+	public static void exportFile(File file, String pageContent){
 		try {
-			FileOutputStream outputStream = new FileOutputStream(new File(dirPath));
+			FileOutputStream outputStream = new FileOutputStream(file);
 			PrintWriter writer = new PrintWriter(outputStream);
 			writer.write(pageContent);
 			writer.close();

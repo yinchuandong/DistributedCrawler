@@ -7,7 +7,7 @@ public class TestRedis {
 
 	public static void main(String[] args){
 		Jedis jedis = RedisUtil.getInstance();
-		String name = jedis.get("name");
+		String name = jedis.get("name2");
 		System.out.println(name);
 		System.out.println(jedis.keys("*").size());
 	}

@@ -1,6 +1,8 @@
 package util;
 
 
+import java.io.File;
+
 import redis.clients.jedis.Jedis;
 
 public class RedisUtil {
@@ -12,7 +14,13 @@ public class RedisUtil {
 	}
 	
 	public static Jedis getInstance(){
-		return getInstance("127.0.0.1", 6379);
+		if(jedis == null){
+			String[] connstr = PageUtil.readFile(new File("./redis.conf")).split(":");
+			String ip = connstr[0];
+			int port = Integer.parseInt(connstr[1]);
+			jedis = new Jedis(ip, port);
+		}
+		return jedis;
 	}
 	
 	public static Jedis getInstance(String ip, int port){
