@@ -41,6 +41,7 @@ public class Index extends JFrame{
 	private DefaultTableModel tableModel;
 	private Map<String, Integer> slaveIdMap;
 	private ArrayList<String> seedsList;
+	private ArrayList<String> selectedSlaveList;
 	private ConsistentHash<ServerNode> consistentHash;
 	
 	//--------UI components--------
@@ -153,6 +154,7 @@ public class Index extends JFrame{
 	    slaveIdMap = new HashMap<String, Integer>();
 	    consistentHash = new ConsistentHash<ServerNode>(new HashFunction(), 1000);
 	    seedsList = new ArrayList<String>();
+	    selectedSlaveList = new ArrayList<String>();
 	}
 	
 	private void bindFrameEvent(){
@@ -225,27 +227,34 @@ public class Index extends JFrame{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-//				boolean isChecked = (boolean) tableModel.getValueAt(0, 0);
-//			    System.out.println(isChecked);
 				loadSlave();
 				loadSeeds();
 				dispatchUrl();
 			}
 		});
 		
+		//开启爬虫
 		doCrawlBtn.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				Command cmd = new Command(Command.CMD_START, "start crawling");
+				for (String slaveId : selectedSlaveList) {
+					socketServer.send(slaveId, cmd);
+					System.out.println(slaveId);
+				}
 			}
 		});
 	}
 	
+	/**
+	 * 加载选中的slave
+	 */
 	private void loadSlave(){
 		//select the checked slave node
 		int row = tableModel.getRowCount();
 		consistentHash.clear();
+		selectedSlaveList.clear();
 		for (int i = 0; i < row; i++) {
 			boolean isSlected = (boolean)tableModel.getValueAt(i, 0);
 			if(isSlected){
@@ -253,10 +262,14 @@ public class Index extends JFrame{
 				int port = (int)tableModel.getValueAt(i, 2);
 				ServerNode node = new ServerNode(ip, port);
 				consistentHash.add(node);
+				selectedSlaveList.add(node.toString());
 			}
 		}
 	}
 	
+	/**
+	 * 加载种子文件
+	 */
 	private void loadSeeds(){
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(new File("./data/baidu.txt")));
@@ -272,12 +285,15 @@ public class Index extends JFrame{
 		}
 	}
 	
+	/**
+	 * 分发url给选中的从机
+	 */
 	private void dispatchUrl(){
 		for (String surl : seedsList) {
 			ServerNode node = consistentHash.get(surl);
 			String slaveId = node.toString();
 			Command cmd = new Command(Command.CMD_DISPATCH_TASK, surl);
-//			socketServer.send(slaveId, cmd);
+			socketServer.send(slaveId, cmd);
 			System.out.println(slaveId);
 		}
 	}

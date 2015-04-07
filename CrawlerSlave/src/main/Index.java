@@ -2,8 +2,12 @@ package main;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
@@ -20,6 +24,9 @@ import distribute.Handler.OnAsyncTaskListener;
 
 public class Index extends JFrame{
 	private SocketClient socketClient;
+	private ArrayList<String> urlList;
+	
+	
 	private JTextField ipText;
 	private JButton connetBtn;
 	private JTextField sendText;
@@ -29,6 +36,7 @@ public class Index extends JFrame{
 	private JTextField portText;
 	public Index() {
 		initComponents();
+		initData();
 		bindFrameEvent();
 	}
 	
@@ -67,6 +75,10 @@ public class Index extends JFrame{
 		portText.setColumns(10);
 		portText.setBounds(131, 6, 50, 28);
 		getContentPane().add(portText);
+	}
+	
+	private void initData(){
+		urlList = new ArrayList<String>();
 	}
 	
 	public static void main(String[] args){
@@ -119,20 +131,26 @@ public class Index extends JFrame{
 		socketClient.setOnAsyncTaskListener(new OnAsyncTaskListener() {
 			
 			@Override
-			public void onReceive(Handler handler, Command command) {
-				switch (command.getType()) {
+			public void onReceive(Handler handler, Command cmd) {
+				switch (cmd.getType()) {
 				case Command.CMD_MSG:
 					String text = textArea.getText();
 					String cmdStr = "";
 					cmdStr += handler.getServerId() + "--type";
-					cmdStr += command.getType() + " info:" + command.getInfo();
+					cmdStr += cmd.getType() + " info:" + cmd.getInfo();
 					text = text + cmdStr + "\n";
 					textArea.setText(text);
 					textArea.setCaretPosition(text.length());
 					break;
 					
 				case Command.CMD_DISPATCH_TASK:
+					urlList.add(cmd.getInfo());
+					System.out.println("url:" + cmd.getInfo());
+					break;
 					
+				case Command.CMD_START:
+					writeUrl();
+					System.out.println("start:" + cmd.getInfo());
 					break;
 
 				default:
@@ -146,4 +164,19 @@ public class Index extends JFrame{
 			}
 		});
 	}
+	
+	
+	private void writeUrl(){
+		try {
+			PrintWriter writer = new PrintWriter(new File("data/seed.txt"));
+			for (String url : urlList) {
+				writer.println(url);
+			}
+			writer.flush();
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
 }

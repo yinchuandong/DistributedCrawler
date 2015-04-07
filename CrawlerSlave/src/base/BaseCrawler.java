@@ -74,10 +74,17 @@ public abstract class BaseCrawler {
 	 * 开始爬取，由外部调用
 	 */
 	public void begin(){
+		loadWaitList();
+		doCrawl();
+	}
+	
+	/**
+	 * 开启爬虫线程
+	 */
+	private void doCrawl(){
 		if (isRunning) {
 			return;
 		}
-		loadWaitList();
 		new Thread(){
 			@Override
 			public void run(){
@@ -97,6 +104,7 @@ public abstract class BaseCrawler {
 		}.start();
 	}
 	
+	
 	/**
 	 * 将waitList的头结点弹出
 	 * @return
@@ -107,25 +115,38 @@ public abstract class BaseCrawler {
 	}
 	
 	/**
-	 * 添加一个url到waitList
+	 * 将url添加到等待队列中，并且添加到redis未访问记录中
+	 * @param url
+	 * @param uniqueKey
+	 */
+	public synchronized void addWaitList(String url, String uniqueKey){
+		//如果url没有被记录
+		if(!jedis.exists(uniqueKey)){
+			waitList.offer(url);
+			jedis.set(uniqueKey, 0+"");
+			return;
+		}
+		
+		//如果url被记录了但是没有被爬取
+		if(jedis.get(uniqueKey).equals("0")){
+			waitList.offer(url);
+		}
+	}
+	
+	/**
+	 * 添加一个url到waitList,不会判断redis是否存在该url
 	 * @param url
 	 * @param deeps
 	 */
 	public synchronized void addWaitList(String url){
 		waitList.offer(url);
-//		String key = AppUtil.md5(url);
-//		urlDeeps.put(key, deeps);
 	}
 	
 	/**
-	 * 将url添加到未访问的列表
-	 * 存入mysql数据库中
+	 * 将url添加到未访问的列表, 不会判断redis是否存在改uniqueKey
 	 * @param uniqueKey 如:guangzhou-1
 	 */
 	public synchronized void addUnVisitPath(String uniqueKey){
-//		String sid = AppUtil.md5(uniqueKey);
-//		String sql = "insert into t_crawled (sid,sname,isVisited) values (?,?,?)";
-//		DbUtil.executeUpdate(sql, new String[]{sid, uniqueKey, "0"});
 		jedis.set(uniqueKey, 0+"");
 	}
 	
@@ -136,9 +157,6 @@ public abstract class BaseCrawler {
 	 * 则uniqueKey为baiyunshan-2的md5值
 	 */
 	public synchronized void visitUrl(String uniqueKey){
-//		String sid = AppUtil.md5(uniqueKey);
-//		String sql = "update t_crawled set isVisited='1' where sid=?";
-//		DbUtil.executeUpdate(sql, new String[]{sid});
 		jedis.set(uniqueKey, 1+"");
 	}
 	
@@ -217,7 +235,9 @@ public abstract class BaseCrawler {
 				e.printStackTrace();
 			}
 			//再次调用爬虫，避免因解析耗时过多，导致等待队列为空，爬虫停止的情况
-			begin();
+			if(!isRunning && !waitList.isEmpty()){
+				doCrawl();
+			}
 		}
 	}
 	

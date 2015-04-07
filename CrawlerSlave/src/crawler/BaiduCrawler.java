@@ -39,9 +39,8 @@ public class BaiduCrawler extends BaseCrawler{
 			while((tmpStr = reader.readLine()) != null){
 				if (!tmpStr.startsWith("#")) {
 					String url = this.generateUrl(tmpStr, 1);
-					super.addWaitList(url);
 					String uniqueKey = tmpStr + "-1";
-					super.addUnVisitPath(uniqueKey);
+					super.addWaitList(url, uniqueKey);
 				}
 			}
 			reader.close();
@@ -76,7 +75,8 @@ public class BaiduCrawler extends BaseCrawler{
 	@Override
 	public void loadWaitList() {
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader("./data/seed.txt"));
+			//将task.txt里面的任务加载
+			BufferedReader reader = new BufferedReader(new FileReader("./data/task.txt"));
 			String tmpStr = null;
 			while((tmpStr = reader.readLine()) != null){
 				if (!tmpStr.startsWith("#")) {
@@ -84,7 +84,8 @@ public class BaiduCrawler extends BaseCrawler{
 					String surl = arr[0];
 					int page = Integer.parseInt(arr[1]);
 					String fullUrl = this.generateUrl(surl, page);
-					super.addWaitList(fullUrl);
+					String uniqueKey = surl + "-1";
+					super.addWaitList(fullUrl, uniqueKey);
 				}
 			}
 			reader.close();
@@ -134,12 +135,8 @@ public class BaiduCrawler extends BaseCrawler{
 			for(int i=currentPage+1; i<=pageNums; i++){
 				//如果该url没有被访问过，则添加到未访问列表中
 				String uniqueKey = surl + "-" + i;
-				if (!jedis.exists(uniqueKey)) {
-					//添加到等待队列
-					String tmpUrl = this.generateUrl(surl, i);
-					addWaitList(tmpUrl);
-					addUnVisitPath(uniqueKey);
-				}
+				String tmpUrl = this.generateUrl(surl, i);
+				addWaitList(tmpUrl, uniqueKey);
 			}
 			
 			//解析景点列表
@@ -173,13 +170,10 @@ public class BaiduCrawler extends BaseCrawler{
 			String sceneLayer = sceneObj.getString("scene_layer");
 			
 			//如果该url没有被访问过，则添加到未访问列表中
+			String tmpUrl = this.generateUrl(surl, 1);
 			String uniqueKey = surl + "-" + 1;
-			if (!jedis.exists(uniqueKey)) {
-				//添加到等待队列
-				String tmpUrl = this.generateUrl(surl, 1);
-				addWaitList(tmpUrl);
-				addUnVisitPath(uniqueKey);
-			}
+			//添加到等待队列
+			addWaitList(tmpUrl, uniqueKey);
 			
 			System.out.println(sid);
 			System.out.println(surl);
