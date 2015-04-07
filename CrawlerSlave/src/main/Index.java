@@ -18,6 +18,7 @@ import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import crawler.BaiduCrawler;
 import distribute.Handler;
 import distribute.SocketClient;
 import distribute.Handler.OnAsyncTaskListener;
@@ -25,6 +26,7 @@ import distribute.Handler.OnAsyncTaskListener;
 public class Index extends JFrame{
 	private SocketClient socketClient;
 	private ArrayList<String> urlList;
+	private BaiduCrawler baiduCrawler;
 	
 	
 	private JTextField ipText;
@@ -79,6 +81,7 @@ public class Index extends JFrame{
 	
 	private void initData(){
 		urlList = new ArrayList<String>();
+		baiduCrawler = new BaiduCrawler();
 	}
 	
 	public static void main(String[] args){
@@ -150,6 +153,7 @@ public class Index extends JFrame{
 					
 				case Command.CMD_START:
 					writeUrl();
+					baiduCrawler.begin();
 					System.out.println("start:" + cmd.getInfo());
 					break;
 

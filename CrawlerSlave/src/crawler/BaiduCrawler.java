@@ -29,10 +29,12 @@ public class BaiduCrawler extends BaseCrawler{
 		super();
 		this.timestamp = System.currentTimeMillis();
 		this.setDomain("http://lvyou.baidu.com");
-		this.init();
 	}
 	
-	private void init(){
+	/**
+	 * 载入种子文件
+	 */
+	private void loadSeed(){
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader("./data/seed.txt"));
 			String tmpStr = null;
@@ -41,6 +43,27 @@ public class BaiduCrawler extends BaseCrawler{
 					String url = this.generateUrl(tmpStr, 1);
 					String uniqueKey = tmpStr + "-1";
 					super.addWaitList(url, uniqueKey);
+				}
+			}
+			reader.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void loadTask(){
+		try {
+			//将task.txt里面的任务加载
+			BufferedReader reader = new BufferedReader(new FileReader("./data/task.txt"));
+			String tmpStr = null;
+			while((tmpStr = reader.readLine()) != null){
+				if (!tmpStr.startsWith("#")) {
+					String[] arr = tmpStr.split("-");
+					String surl = arr[0];
+					int page = Integer.parseInt(arr[1]);
+					String fullUrl = this.generateUrl(surl, page);
+					String uniqueKey = surl + "-1";
+					super.addWaitList(fullUrl, uniqueKey);
 				}
 			}
 			reader.close();
@@ -74,25 +97,7 @@ public class BaiduCrawler extends BaseCrawler{
 	
 	@Override
 	public void loadWaitList() {
-		try {
-			//将task.txt里面的任务加载
-			BufferedReader reader = new BufferedReader(new FileReader("./data/task.txt"));
-			String tmpStr = null;
-			while((tmpStr = reader.readLine()) != null){
-				if (!tmpStr.startsWith("#")) {
-					String[] arr = tmpStr.split("-");
-					String surl = arr[0];
-					int page = Integer.parseInt(arr[1]);
-					String fullUrl = this.generateUrl(surl, page);
-					String uniqueKey = surl + "-1";
-					super.addWaitList(fullUrl, uniqueKey);
-				}
-			}
-			reader.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+		loadSeed();
 	}
 
 	@Override
