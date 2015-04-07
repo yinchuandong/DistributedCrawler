@@ -18,7 +18,9 @@ import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import crawler.BaiduCrawler;
+import base.BaseCrawler;
+import crawler.BaiduHotelCrawler;
+import crawler.BaiduSceneCrawler;
 import distribute.Handler;
 import distribute.SocketClient;
 import distribute.Handler.OnAsyncTaskListener;
@@ -26,7 +28,7 @@ import distribute.Handler.OnAsyncTaskListener;
 public class Index extends JFrame{
 	private SocketClient socketClient;
 	private ArrayList<String> urlList;
-	private BaiduCrawler baiduCrawler;
+	private BaseCrawler baiduCrawler;
 	
 	
 	private JTextField ipText;
@@ -81,7 +83,7 @@ public class Index extends JFrame{
 	
 	private void initData(){
 		urlList = new ArrayList<String>();
-		baiduCrawler = new BaiduCrawler();
+		baiduCrawler = new BaiduSceneCrawler();
 	}
 	
 	public static void main(String[] args){
@@ -144,24 +146,39 @@ public class Index extends JFrame{
 					text = text + cmdStr + "\n";
 					textArea.setText(text);
 					textArea.setCaretPosition(text.length());
+					
+					//根据信息判断初始化哪个爬虫
+					if(cmd.getInfo().startsWith("#scene")){
+						baiduCrawler = new BaiduSceneCrawler();
+						System.out.println("-----------------reinit BaiduSceneCrawler-----------");
+					}else if (cmd.getInfo().startsWith("#hotel")) {
+						baiduCrawler = new BaiduHotelCrawler();
+						System.out.println("-----------------reinit BaiduHotelCrawler-----------");
+
+					}
+					
 					break;
 					
 				case Command.CMD_DISPATCH_TASK:
+					//分发url
 					urlList.add(cmd.getInfo());
 					System.out.println("url:" + cmd.getInfo());
 					break;
 					
 				case Command.CMD_WRITE_URL:
+					//url分发完毕，并写入文件中,初始化爬虫
 					writeUrl();
 					baiduCrawler.initSeeds();
 					break;
 					
 				case Command.CMD_START:
+					//开启爬虫
 					baiduCrawler.start();
 					System.out.println("start:" + cmd.getInfo());
 					break;
 					
 				case Command.CMD_PAUSE:
+					//暂停爬虫
 					baiduCrawler.pause();
 					break;
 					
@@ -180,7 +197,13 @@ public class Index extends JFrame{
 	
 	private void writeUrl(){
 		try {
-			PrintWriter writer = new PrintWriter(new File("data/seed.txt"));
+			File seedsFile = null;
+			if(baiduCrawler instanceof BaiduSceneCrawler){
+				seedsFile = new File("data/baidu-scene.txt");
+			}else if (baiduCrawler instanceof BaiduHotelCrawler) {
+				seedsFile = new File("data/baidu-hotel.txt");
+			}
+			PrintWriter writer = new PrintWriter(seedsFile);
 			for (String url : urlList) {
 				writer.println(url);
 			}

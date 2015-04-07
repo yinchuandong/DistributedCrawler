@@ -1,4 +1,4 @@
 CrawlerMaster/bin/
 CrawlerSlave/bin/
-CrawlerSlave/web/
+CrawlerSlave/web*
 .DS_Store

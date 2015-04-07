@@ -14,7 +14,7 @@ import util.DbUtil;
 import util.PageUtil;
 import base.BaseCrawler;
 
-public class BaiduCrawler extends BaseCrawler{
+public class BaiduSceneCrawler extends BaseCrawler{
 
 	/**
 	 * 每一页景点的数量
@@ -25,51 +25,10 @@ public class BaiduCrawler extends BaseCrawler{
 	 */
 	private long timestamp ;
 	//-------------------------------------------
-	public BaiduCrawler(){
+	public BaiduSceneCrawler(){
 		super();
 		this.timestamp = System.currentTimeMillis();
 		this.setDomain("http://lvyou.baidu.com");
-	}
-	
-	/**
-	 * 载入种子文件
-	 */
-	private void loadSeed(){
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader("./data/seed.txt"));
-			String tmpStr = null;
-			while((tmpStr = reader.readLine()) != null){
-				if (!tmpStr.startsWith("#")) {
-					String url = this.generateUrl(tmpStr, 1);
-					String uniqueKey = tmpStr + "-1";
-					super.addWaitList(url, uniqueKey);
-				}
-			}
-			reader.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void loadTask(){
-		try {
-			//将task.txt里面的任务加载
-			BufferedReader reader = new BufferedReader(new FileReader("./data/task.txt"));
-			String tmpStr = null;
-			while((tmpStr = reader.readLine()) != null){
-				if (!tmpStr.startsWith("#")) {
-					String[] arr = tmpStr.split("-");
-					String surl = arr[0];
-					int page = Integer.parseInt(arr[1]);
-					String fullUrl = this.generateUrl(surl, page);
-					String uniqueKey = surl + "-1";
-					super.addWaitList(fullUrl, uniqueKey);
-				}
-			}
-			reader.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 	
 	/**
@@ -97,7 +56,20 @@ public class BaiduCrawler extends BaseCrawler{
 	
 	@Override
 	public void loadWaitList() {
-		loadSeed();
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader("./data/baidu-scene.txt"));
+			String tmpStr = null;
+			while((tmpStr = reader.readLine()) != null){
+				if (!tmpStr.startsWith("#")) {
+					String url = this.generateUrl(tmpStr, 1);
+					String uniqueKey = tmpStr + "-1";
+					super.addWaitList(url, uniqueKey);
+				}
+			}
+			reader.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -189,7 +161,7 @@ public class BaiduCrawler extends BaseCrawler{
 	}
 	
 	public static void main(String[] args){
-		final BaiduCrawler crawler = new BaiduCrawler();
+		final BaiduSceneCrawler crawler = new BaiduSceneCrawler();
 		crawler.start();
 		
 //		new Thread(){
