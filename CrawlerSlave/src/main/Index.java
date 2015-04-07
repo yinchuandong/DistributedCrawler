@@ -151,12 +151,20 @@ public class Index extends JFrame{
 					System.out.println("url:" + cmd.getInfo());
 					break;
 					
-				case Command.CMD_START:
+				case Command.CMD_WRITE_URL:
 					writeUrl();
-					baiduCrawler.begin();
+					baiduCrawler.initSeeds();
+					break;
+					
+				case Command.CMD_START:
+					baiduCrawler.start();
 					System.out.println("start:" + cmd.getInfo());
 					break;
-
+					
+				case Command.CMD_PAUSE:
+					baiduCrawler.pause();
+					break;
+					
 				default:
 					break;
 				}

@@ -189,8 +189,23 @@ public class BaiduCrawler extends BaseCrawler{
 	}
 	
 	public static void main(String[] args){
-		BaiduCrawler crawler = new BaiduCrawler();
-		crawler.begin();
+		final BaiduCrawler crawler = new BaiduCrawler();
+		crawler.start();
+		
+//		new Thread(){
+//			public void run(){
+//				try {
+//					Thread.sleep(5000);
+//					System.out.println("stop----------");
+//					crawler.stop();
+//					Thread.sleep(5000);
+//					System.out.println("restart----------");
+////					crawler.startWithoutLoading();
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}.start();
 	}
 
 	

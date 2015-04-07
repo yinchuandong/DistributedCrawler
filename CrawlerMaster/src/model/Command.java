@@ -31,6 +31,10 @@ public class Command implements Serializable{
 	 * 发送消息
 	 */
 	public static final int CMD_MSG = 1006;
+	/**
+	 * 写入url到文件
+	 */
+	public static final int CMD_WRITE_URL = 1007;
 	
 	/**
 	 * 

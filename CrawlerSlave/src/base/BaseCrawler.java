@@ -63,6 +63,8 @@ public abstract class BaseCrawler {
 	 */
 	private boolean isRunning = false;
 	
+	private boolean isPaused = false;
+	
 	public BaseCrawler(){
 		urlDeeps = new ConcurrentHashMap<String, Integer>();
 		waitList =  new LinkedList<String>();
@@ -71,12 +73,39 @@ public abstract class BaseCrawler {
 	}
 	
 	/**
-	 * 开始爬取，由外部调用
+	 * 初始化种子
 	 */
-	public void begin(){
+	public void initSeeds(){
+		reset();
 		loadWaitList();
+	}
+	
+	/**
+	 * 自动加载种子数据,开始爬取,由外部调用
+	 */
+	public void start(){
+		this.isRunning = false;
+		this.isPaused = false;
 		doCrawl();
 	}
+	
+	public void pause(){
+		this.isRunning = false;
+		this.isPaused = true;
+	}
+	
+	public void stop(){
+		this.isRunning = false;
+		this.isPaused = true;
+		this.waitList.clear();
+	}
+	
+	public void reset(){
+		this.isRunning = false;
+		this.isPaused = false;
+		this.waitList.clear();
+	}
+
 	
 	/**
 	 * 开启爬虫线程
@@ -90,7 +119,7 @@ public abstract class BaseCrawler {
 			public void run(){
 				isRunning = true;
 				System.out.println("----------启动线程----------------------");
-				while(!waitList.isEmpty()){
+				while(!waitList.isEmpty() && !isPaused){
 					String url = popWaitList();
 					taskPool.execute(new ProcessThread(url));
 					try {
@@ -103,7 +132,6 @@ public abstract class BaseCrawler {
 			}
 		}.start();
 	}
-	
 	
 	/**
 	 * 将waitList的头结点弹出
@@ -235,7 +263,7 @@ public abstract class BaseCrawler {
 				e.printStackTrace();
 			}
 			//再次调用爬虫，避免因解析耗时过多，导致等待队列为空，爬虫停止的情况
-			if(!isRunning && !waitList.isEmpty()){
+			if(!waitList.isEmpty() && !isRunning && !isPaused){
 				doCrawl();
 			}
 		}

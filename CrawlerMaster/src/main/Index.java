@@ -55,6 +55,7 @@ public class Index extends JFrame{
 	private JButton pauseCrawlBtn;
 	private JButton doCrawlBtn;
 	private JButton withdrawBtn;
+	private JButton writeUrlBtn;
 	public Index() {
 		try {
 			//默认绑定9090端口
@@ -112,7 +113,7 @@ public class Index extends JFrame{
 		};
 		scrollPane_1.setViewportView(table);
 		
-		dispatchBtn = new JButton("分配url");
+		dispatchBtn = new JButton("1.分配url");
 		dispatchBtn.setBounds(355, 23, 117, 29);
 		getContentPane().add(dispatchBtn);
 		
@@ -121,16 +122,20 @@ public class Index extends JFrame{
 		getContentPane().add(pauseCrawlBtn);
 		
 		JButton removeBtn = new JButton("移除从机");
-		removeBtn.setBounds(484, 23, 117, 29);
+		removeBtn.setBounds(613, 64, 117, 29);
 		getContentPane().add(removeBtn);
 		
-		doCrawlBtn = new JButton("开始爬取");
-		doCrawlBtn.setBounds(355, 64, 117, 29);
+		doCrawlBtn = new JButton("3.开始爬取");
+		doCrawlBtn.setBounds(613, 23, 117, 29);
 		getContentPane().add(doCrawlBtn);
 		
 		withdrawBtn = new JButton("回收文件");
-		withdrawBtn.setBounds(613, 23, 117, 29);
+		withdrawBtn.setBounds(355, 64, 117, 29);
 		getContentPane().add(withdrawBtn);
+		
+		writeUrlBtn = new JButton("2.完成url分发");
+		writeUrlBtn.setBounds(484, 23, 117, 29);
+		getContentPane().add(writeUrlBtn);
 	}
 	
 	public static void main(String[] args){
@@ -159,6 +164,7 @@ public class Index extends JFrame{
 	
 	private void bindFrameEvent(){
 		
+		//启动服务器
 		startBtn.addActionListener(new ActionListener() {
 			
 			@Override
@@ -167,6 +173,7 @@ public class Index extends JFrame{
 			}
 		});
 		
+		//发送消息
 		sendBtn.addActionListener(new ActionListener() {
 			
 			@Override
@@ -177,6 +184,53 @@ public class Index extends JFrame{
 				}
 				socketServer.sendAll(new Command(Command.CMD_MSG, msg));
 				msg = "";
+			}
+		});
+		
+
+		//1.分配url
+		dispatchBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				loadSlave();
+				loadSeeds();
+				dispatchUrl();
+			}
+		});
+		
+		//2.write url
+		writeUrlBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Command cmd = new Command(Command.CMD_WRITE_URL, "write url to  data/seed.txt");
+				for (String slaveId : selectedSlaveList) {
+					socketServer.send(slaveId, cmd);
+				}
+			}
+		});
+		
+		//3.开启爬虫
+		doCrawlBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Command cmd = new Command(Command.CMD_START, "start crawling");
+				for (String slaveId : selectedSlaveList) {
+					socketServer.send(slaveId, cmd);
+				}
+			}
+		});
+		
+		pauseCrawlBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Command cmd = new Command(Command.CMD_PAUSE, "pause crawling");
+				for (String slaveId : selectedSlaveList) {
+					socketServer.send(slaveId, cmd);
+				}
 			}
 		});
 	}
@@ -221,30 +275,6 @@ public class Index extends JFrame{
 
 		});
 		
-		
-		//分配url
-		dispatchBtn.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				loadSlave();
-				loadSeeds();
-				dispatchUrl();
-			}
-		});
-		
-		//开启爬虫
-		doCrawlBtn.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Command cmd = new Command(Command.CMD_START, "start crawling");
-				for (String slaveId : selectedSlaveList) {
-					socketServer.send(slaveId, cmd);
-					System.out.println(slaveId);
-				}
-			}
-		});
 	}
 	
 	/**
@@ -297,29 +327,4 @@ public class Index extends JFrame{
 			System.out.println(slaveId);
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
