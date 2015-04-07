@@ -51,7 +51,7 @@ public class Index extends JFrame{
 		getContentPane().add(connetBtn);
 		
 		ipText = new JTextField();
-		ipText.setText("127.0.0.1");
+		ipText.setText("192.168.233.42");
 		ipText.setBounds(28, 6, 102, 28);
 		getContentPane().add(ipText);
 		ipText.setColumns(10);
@@ -103,7 +103,7 @@ public class Index extends JFrame{
 				}
 				
 				try {
-					socketClient = new SocketClient("127.0.0.1", port);
+					socketClient = new SocketClient(masterIp, port);
 					bindAsyncEvent();
 					socketClient.start();
 				} catch (UnknownHostException e1) {
