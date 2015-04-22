@@ -14,7 +14,7 @@ public class RedisUtil {
 	}
 	
 	public static Jedis getInstance(){
-		if(jedis == null){
+		if(jedis == null || !jedis.isConnected()){
 			String[] connstr = PageUtil.readFile(new File("./redis.conf")).split(":");
 			String ip = connstr[0];
 			int port = Integer.parseInt(connstr[1]);
@@ -24,7 +24,7 @@ public class RedisUtil {
 	}
 	
 	public static Jedis getInstance(String ip, int port){
-		if(jedis == null){
+		if(jedis == null || !jedis.isConnected()){
 			jedis = new Jedis(ip, port);
 		}
 		return jedis;
