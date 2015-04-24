@@ -56,7 +56,7 @@ public abstract class BaseCrawler {
 	/**
 	 * 延时时间
 	 */
-	private int delay = 5000;
+	private int delay = 200;
 	
 	/**
 	 * 判断爬虫是否正在运行
