@@ -17,7 +17,7 @@ import util.RedisUtil;
 
 /**
  * 爬取通用html页面的基类
- * @author yinchuandong
+ * @author yuanyun
  *
  */
 public abstract class BaseCrawler {

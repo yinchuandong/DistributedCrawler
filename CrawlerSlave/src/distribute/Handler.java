@@ -18,7 +18,7 @@ import model.Command;
 
 /**
  * 每一个handler对应一个slave
- * @author wangjiewen
+ * @author yuanyun
  *
  */
 public class Handler implements Runnable{
