@@ -54,7 +54,7 @@ public class DbUtil {
 			com.mysql.jdbc.Driver jdbcDriver = new com.mysql.jdbc.Driver();
 			DriverManager.registerDriver(jdbcDriver);
 			
-			String dbUrl = "jdbc:mysql://127.0.0.1:3306/travel?characterEncoding=gbk";
+			String dbUrl = "jdbc:mysql://127.0.0.1:3306/traveldata?characterEncoding=utf-8";
 //			String dbUrl = "jdbc:mysql://192.168.233.21:3306/travel";
 			String dbUser = "123";
 			String dbPwd = "123";

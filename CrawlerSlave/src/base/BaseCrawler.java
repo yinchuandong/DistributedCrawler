@@ -156,18 +156,9 @@ public abstract class BaseCrawler {
 		}
 		
 		//如果url被记录了但是没有被爬取
-		if(jedis.get(uniqueKey).equals("0")){
+		if(jedis.get(uniqueKey).equals("0") && !waitList.contains(url)){
 			waitList.offer(url);
 		}
-	}
-	
-	/**
-	 * 添加一个url到waitList,不会判断redis是否存在该url
-	 * @param url
-	 * @param deeps
-	 */
-	public synchronized void addWaitList(String url){
-		waitList.offer(url);
 	}
 	
 	/**

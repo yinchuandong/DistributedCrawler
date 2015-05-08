@@ -88,15 +88,15 @@ public class BaiduSceneCrawler extends BaseCrawler{
 			String sid = dataObj.getString("sid");
 			String surl = dataObj.getString("surl");
 			String sname = dataObj.getString("sname");
-			String ambiguitySname = dataObj.getString("ambiguity_sname");
-			String parentSid = dataObj.getString("parent_sid");
-			String viewCount = dataObj.getString("view_count");
-			String star = dataObj.getString("star");
-			String sceneLayer = dataObj.getString("scene_layer");
-			int goingCount = dataObj.getInt("going_count");
-			int goneCount = dataObj.getInt("gone_count");
-			double rating = dataObj.getDouble("rating");
-			int ratingCount = dataObj.getInt("rating_count");
+//			String ambiguitySname = dataObj.getString("ambiguity_sname");
+//			String parentSid = dataObj.getString("parent_sid");
+//			String viewCount = dataObj.getString("view_count");
+//			String star = dataObj.getString("star");
+//			String sceneLayer = dataObj.getString("scene_layer");
+//			int goingCount = dataObj.getInt("going_count");
+//			int goneCount = dataObj.getInt("gone_count");
+//			double rating = dataObj.getDouble("rating");
+//			int ratingCount = dataObj.getInt("rating_count");
 			JSONObject extObj = dataObj.getJSONObject("ext");
 			String mapInfo = extObj.getString("map_info");//获得经纬度
 			
@@ -162,6 +162,7 @@ public class BaiduSceneCrawler extends BaseCrawler{
 	
 	public static void main(String[] args){
 		final BaiduSceneCrawler crawler = new BaiduSceneCrawler();
+		crawler.initSeeds();
 		crawler.start();
 		
 //		new Thread(){

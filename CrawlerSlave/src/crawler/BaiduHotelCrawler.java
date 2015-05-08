@@ -50,7 +50,7 @@ public class BaiduHotelCrawler extends BaseCrawler{
 				String url = this.generateUrl(sid, mapX, mapY);
 				String uniqueKey = sid + "-" + mapX + "-" + mapY;
 				this.addUnVisitPath(uniqueKey);
-				this.addWaitList(url);
+				this.addWaitList(url, uniqueKey);
 				System.out.println(url);
 			}
 			reader.close();
