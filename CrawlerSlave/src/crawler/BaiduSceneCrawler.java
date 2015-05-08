@@ -87,7 +87,11 @@ public class BaiduSceneCrawler extends BaseCrawler{
 			//需要保存的数据库字段
 			String sid = dataObj.getString("sid");
 			String surl = dataObj.getString("surl");
+//<<<<<<< HEAD
 //			String sname = dataObj.getString("sname");
+//=======
+			String sname = dataObj.getString("sname");
+//>>>>>>> c10994fe0a308a3108a5714b335b07b4bf51a336
 //			String ambiguitySname = dataObj.getString("ambiguity_sname");
 //			String parentSid = dataObj.getString("parent_sid");
 //			String viewCount = dataObj.getString("view_count");
@@ -162,6 +166,7 @@ public class BaiduSceneCrawler extends BaseCrawler{
 	
 	public static void main(String[] args){
 		final BaiduSceneCrawler crawler = new BaiduSceneCrawler();
+		crawler.initSeeds();
 		crawler.start();
 		
 //		new Thread(){
